@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+enum ReportStatus {
+  PENDING
+  COLLECTED
+  CANCELLED
+}
+
+enum TransactionType {
+  EARN
+  SPEND
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  password          String
+  currentPoints     Int?               @default(0)
+  reports           Report[]           @relation("UserReports")
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model Report {
+  id               Int                @id @default(autoincrement())
+  userId           String
+  user             User               @relation("UserReports", fields: [userId], references: [id], onDelete: Cascade)
+  latitude         Float
+  longitude        Float
+  description      String             @default("none")
+  status           ReportStatus       @default(PENDING)
+  plasticCount     Int                @default(0)
+  glassCount       Int                @default(0)
+  aluminumCount    Int                @default(0)
+  milkCount        Int                @default(0)
+  totalCount       Int                @default(0)
+  pointTransaction PointTransaction?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  earnedPoints     Int                @default(0)
+
+}
+
+model PointTransaction {
+  id        Int             @id @default(autoincrement())
+  userId    String
+  email     String          @default("")
+  amount    Int
+  type      TransactionType
+  reportId  Int?            @unique
+  report    Report?         @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+}
+
+model BottleType {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  points Int
+}
+
