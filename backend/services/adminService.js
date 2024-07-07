@@ -80,6 +80,9 @@ export const updateReport = async (email, reportId, updateReport) => {
             currentPoints: {
                 increment: points,
             },
+            totalPointsEarned: {
+                increment: points,
+            }
         },
     });
 

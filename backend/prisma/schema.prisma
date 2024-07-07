@@ -22,9 +22,10 @@ model User {
   id                String             @id @default(cuid())
   email             String             @unique
   password          String
+  profileImageUrl   String?  
   currentPoints     Int?               @default(0)
+  totalPointsEarned Int?               @default(0)
   reports           Report[]           @relation("UserReports")
-
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 }
@@ -37,6 +38,7 @@ model Report {
   longitude        Float
   description      String             @default("none")
   status           ReportStatus       @default(PENDING)
+  imageUrl         String?
   plasticCount     Int                @default(0)
   glassCount       Int                @default(0)
   aluminumCount    Int                @default(0)

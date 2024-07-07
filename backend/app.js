@@ -4,7 +4,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import constant from "./constants/index.js";
 import router from './router/index.js';
-import prisma from './utils/prisma.js';
 
 // Load environment variables
 dotenv.config();
@@ -12,8 +11,17 @@ dotenv.config();
 // Initialize Express app
 const app = express();
 
+// cors options 
+const corsOptions = {
+  origin: 'http://localhost:5173', // Allow requests from this origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true, // Allow cookies to be sent with requests
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json())
 
@@ -29,6 +37,7 @@ app.use('/api', router);
 
 const PORT = process.env.PORT || constant.PORT;
 const HOSTNAME = constant.HOSTNAME
+
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}, hostname: ${HOSTNAME}`);
 });
