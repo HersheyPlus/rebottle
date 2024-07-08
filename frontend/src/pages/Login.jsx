@@ -1,16 +1,31 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    // Here you would typically send the login data to your backend
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      await login(data.email, data.password);
+      navigate("/profile");
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message || err.response?.data?.message || "An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <section id="login" className="section-container h-screen">
@@ -61,11 +76,13 @@ const Login = () => {
             {errors.password && <p className="mt-1 text-red-500 text-sm">{errors.password.message}</p>}
           </div>
 
+          {error && <p className="mt-1 text-red-500 text-sm mb-4">{error}</p>}
           <button 
             type="submit" 
             className="w-full bg-primary text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
+            disabled={isLoading}
           >
-            Log in
+            {isLoading ? "Logging in..." : "Log in"}
           </button>
         </form>
 

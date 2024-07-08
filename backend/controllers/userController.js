@@ -17,13 +17,15 @@ export const userProfile = async (req, res, next) => {
 
 export const registerUser = async (req, res, next) => {
   try {
-    const user = await userService.register(req.body);
+    const { email, password } = req.body;
+    const user = await userService.register({ email, password });
     res.status(201).json(user);
   } catch (error) {
+    console.error('Registration error:', error);
     if (error.message === 'Email already in use') {
       res.status(400).json({ message: error.message });
     } else {
-      next(error);
+      res.status(500).json({ message: 'An error occurred during registration' });
     }
   }
 };
@@ -32,14 +34,25 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await userService.login(email, password);
-    res.json(user);
+    const result = await userService.login(email, password);
+    res.json(result);
   } catch (error) {
     if (error.message === 'Invalid credentials') {
-      res.status(400).json({ message: error.message });
+      res.status(401).json({ message: error.message });
     } else {
       next(error);
     }
+  }
+};
+
+export const logoutUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    await userService.clearRefreshToken(userId);
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'An error occurred during logout' });
   }
 };
 
@@ -77,3 +90,15 @@ export const deleteUser = async (req, res, next) => {
     }
   }
 };
+
+
+export const refreshTokenController = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    const tokens = await userService.refreshUserToken(refreshToken);
+    res.json(tokens);
+  } catch (error) {
+    next(error);
+  }
+};
+

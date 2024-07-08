@@ -1,16 +1,36 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../contexts/AuthContext";
 
 const Register = () => {
+  
   const [showPassword, setShowPassword] = useState(false);
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
-
-  const onSubmit = (data) => {
-    console.log(data);
-    // Here you would typically send the data to your backend
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { register: registerForm, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      console.log('Submitting registration data:', { email: data.email, password: '****' });
+      const success = await register(data.email, data.password);
+      console.log('Registration successful:', success);
+      if (success) {
+        navigate('/profile');  // Redirect to profile page after successful registration
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message || "An error occurred during registration");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   const password = watch("password");
 
@@ -29,7 +49,7 @@ const Register = () => {
               id="email" 
               placeholder="Enter your email" 
               className={`w-full px-3 py-2 border rounded-md placeholder-secondary focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-secondary focus:ring-secondary'}`}
-              {...register("email", { 
+              {...registerForm("email", { 
                 required: "Email is required", 
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -48,7 +68,7 @@ const Register = () => {
                 id="password" 
                 placeholder="Enter your password" 
                 className={`w-full px-3 py-2 border rounded-md placeholder-secondary focus:outline-none focus:ring-2 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-secondary focus:ring-secondary'}`}
-                {...register("password", { 
+                {...registerForm("password", { 
                   required: "Password is required",
                   minLength: {
                     value: 4,
@@ -75,7 +95,7 @@ const Register = () => {
                 id="confirmPassword" 
                 placeholder="Confirm your password" 
                 className={`w-full px-3 py-2 border rounded-md placeholder-secondary focus:outline-none focus:ring-2 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-secondary focus:ring-secondary'}`}
-                {...register("confirmPassword", { 
+                {...registerForm("confirmPassword", { 
                   required: "Please confirm your password",
                   validate: value => value === password || "Passwords do not match"
                 })}
@@ -90,12 +110,13 @@ const Register = () => {
             </div>
             {errors.confirmPassword && <p className="mt-1 text-red-500 text-sm">{errors.confirmPassword.message}</p>}
           </div>
-
+          {error && <p className="mt-1 text-red-500 text-sm mb-4">{error}</p>}
           <button 
             type="submit" 
             className="w-full bg-primary text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
+            disabled={isLoading}
           >
-            Register
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
 

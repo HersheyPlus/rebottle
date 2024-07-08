@@ -1,8 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaWineBottle } from "react-icons/fa";
 import { sideBarItems } from "../constants/sideItem";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = () => {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed', error);
+      // Optionally, you can still navigate to login or show an error message to the user
+      navigate('/login');
+    }
+  };
+
   return (
     <section id="sidebar">
       <aside
@@ -18,17 +33,34 @@ const Sidebar = () => {
             </h1>
           </Link>
           <ul className="space-y-2 font-medium text-lg lg:text-xl">
-            {sideBarItems.map((item, index) => (
-              <li key={index}>
-                <Link
-                  to={item.to}
-                  className="flex items-center px-2 py-4 rounded-lg group hover:bg-gray-200"
-                >
-                  <item.icon />
-                  <span className="ms-3">{item.label}</span>
-                </Link>
-              </li>
-            ))}
+            {sideBarItems.map((item, index) => {
+              if ((item.label === "Login" && isAuthenticated) ||
+                  (item.label === "Logout" && !isAuthenticated)) {
+                return null;
+              }
+
+              return (
+                <li key={index}>
+                  {item.label === "Logout" ? (
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-2 py-4 rounded-lg group hover:bg-gray-200"
+                    >
+                      <item.icon />
+                      <span className="ms-3">{item.label}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      className="flex items-center px-2 py-4 rounded-lg group hover:bg-gray-200"
+                    >
+                      <item.icon />
+                      <span className="ms-3">{item.label}</span>
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </aside>

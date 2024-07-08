@@ -28,8 +28,11 @@ app.use(express.json())
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
+  res.status(err.status || 500).json({
+    message: err.message,
+    error: process.env.NODE_ENV === 'production' ? {} : err
+  });
+})
 
 // Routes
 app.use('/api', router);

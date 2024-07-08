@@ -6,6 +6,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { AuthProvider } from './contexts/AuthContext.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -21,8 +22,18 @@ import UserReportDetail from './pages/UserReportDetail.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout><App /></Layout>,
-    errorElement : <Layout><ErrorPage /></Layout>,
+    element: 
+      <AuthProvider>
+        <Layout>
+          <App />
+        </Layout>
+      </AuthProvider>,
+    errorElement : 
+      <AuthProvider>
+        <Layout>
+          <ErrorPage />
+        </Layout>
+      </AuthProvider>,
     children: [
       { index: true, element: <Home /> },
       { path: "/login", element: <Login /> },
@@ -33,7 +44,6 @@ const router = createBrowserRouter([
       { path: "/admin-report-detail", element: <AdminReportDetail /> },
       { path: "/user-report-detail", element: <UserReportDetail /> },
       { path: "/report-received", element: <ReportList /> },
-
     ],
   },
 ]);

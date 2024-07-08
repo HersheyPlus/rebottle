@@ -41,6 +41,7 @@ export const getTranscationById = async (user, transactionId) => {
         transaction: transaction 
     };
 }
+
 export const exchangePoints = async (user, exchangePoints) => {
     const userId = user.id;
     if (!userId) {
@@ -85,3 +86,29 @@ export const exchangePoints = async (user, exchangePoints) => {
         transaction: createTransaction
     };
 }
+
+// Add pagination to getAllTransactions
+// export const getAllTransactions = async (user, page = 1, limit = 10) => {
+//     const skip = (page - 1) * limit;
+//     const email = user.email;
+//     const userId = user.id;
+    
+//     const transactions = await prisma.pointTransaction.findMany({
+//       where: { userId: userId },
+//       skip: skip,
+//       take: limit,
+//       orderBy: { createdAt: 'desc' }
+//     });
+  
+//     const totalTransactions = await prisma.pointTransaction.count({
+//       where: { userId: userId }
+//     });
+  
+//     return { 
+//       message: `Get transactions of userId: ${userId} (${email})`, 
+//       transactions: transactions,
+//       total: totalTransactions,
+//       page: page,
+//       totalPages: Math.ceil(totalTransactions / limit)
+//     };
+//   };

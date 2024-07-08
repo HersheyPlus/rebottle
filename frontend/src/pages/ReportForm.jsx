@@ -65,7 +65,7 @@ const ReportForm = () => {
             </label>
             <input
               type="text"
-              id="text"
+              id="username"
               placeholder="Enter more detail about your location"
               className="w-full px-3 py-2 border border-secondary rounded-md placeholder-secondary focus:outline-none focus:ring-2 focus:ring-secondary"
             />
@@ -78,7 +78,7 @@ const ReportForm = () => {
               Description
             </label>
             <textarea
-              id="message"
+              id="description"
               rows="5"
               placeholder="Enter your description about what you found"
               className="w-full p-3 border border-secondary rounded-md placeholder-secondary focus:outline-none focus:ring-2 focus:ring-secondary text-base"
