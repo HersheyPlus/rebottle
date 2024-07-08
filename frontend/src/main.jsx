@@ -15,9 +15,13 @@ import ReportForm from './pages/ReportForm.jsx';
 import ExchangePoints from './pages/ExchangePoints.jsx';
 import Layout from './components/Layout.jsx';
 import ErrorPage from './pages/ErrorPage.jsx';
-import ReportList from './pages/ReportList.jsx';
-import AdminReportDetail from './pages/AdminReportDetail.jsx';
+import UserReportList from './pages/UserReportList.jsx';
+import AdminReportList from './pages/AdminReportList.jsx';
+import AdminReportForm from './pages/AdminReportForm.jsx';
 import UserReportDetail from './pages/UserReportDetail.jsx';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute.jsx';
+
 
 const router = createBrowserRouter([
   {
@@ -36,14 +40,16 @@ const router = createBrowserRouter([
       </AuthProvider>,
     children: [
       { index: true, element: <Home /> },
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <Register /> },
-      { path: "/profile", element: <Profile /> },
-      { path: "/exchanges", element: <ExchangePoints /> },
-      { path: "/report", element: <ReportForm /> },
-      { path: "/admin-report-detail", element: <AdminReportDetail /> },
-      { path: "/user-report-detail", element: <UserReportDetail /> },
-      { path: "/report-received", element: <ReportList /> },
+      { path: "/login", element: <PublicRoute><Login /></PublicRoute> },
+      { path: "/register", element: <PublicRoute ><Register /></PublicRoute> },
+      { path: "/profile", element: <ProtectedRoute><Profile /></ProtectedRoute> },
+      { path: "/exchanges", element: <ProtectedRoute><ExchangePoints /></ProtectedRoute> },
+      { path: "/user-report-form", element: <ProtectedRoute><ReportForm /></ProtectedRoute> },
+      { path: "/user-report-list", element: <ProtectedRoute><UserReportList /></ProtectedRoute> },
+      { path: "/admin-report-form", element: <ProtectedRoute><AdminReportForm /></ProtectedRoute> },
+      { path: "/user-report-detail/:id", element: <ProtectedRoute><UserReportDetail /></ProtectedRoute> },
+      { path: "/admin-report-list", element: <ProtectedRoute><AdminReportList /></ProtectedRoute> },
+      { path: "/admin-report-detail/:id", element: <ProtectedRoute><AdminReportForm /></ProtectedRoute> },
     ],
   },
 ]);

@@ -1,4 +1,5 @@
 
+
 const Vouchers = () => {
   const vouchers = [
     { rewardName: "Get 10% off on all products" },

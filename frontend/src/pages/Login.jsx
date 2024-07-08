@@ -16,8 +16,10 @@ const Login = () => {
     setIsLoading(true);
     setError("");
     try {
-      await login(data.email, data.password);
-      navigate("/profile");
+      const response = await login(data.email, data.password);
+      if (response) {
+        navigate("/profile");
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || err.response?.data?.message || "An error occurred during login");

@@ -13,6 +13,11 @@ enum ReportStatus {
   CANCELLED
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 enum TransactionType {
   EARN
   SPEND
@@ -22,7 +27,8 @@ model User {
   id                String             @id @default(cuid())
   email             String             @unique
   password          String
-  profileImageUrl   String?  
+  profileImageUrl   String?
+  role              Role               @default(USER)  
   currentPoints     Int?               @default(0)
   totalPointsEarned Int?               @default(0)
   reports           Report[]           @relation("UserReports")

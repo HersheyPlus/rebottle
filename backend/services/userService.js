@@ -33,7 +33,6 @@ export const refreshUserToken = async (refreshToken) => {
     const newAccessToken = generateToken(user.id);
     const newRefreshToken = generateRefreshToken(user.id);
 
-    // Update the refresh token in the database
     await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken: newRefreshToken }
@@ -53,6 +52,7 @@ export const profile = async (email) => {
       email: true,
       currentPoints: true,
       totalPointsEarned: true,
+      role: true,
     },
   });
 
@@ -65,18 +65,33 @@ export const profile = async (email) => {
 }
 
 export const register = async ({ email, password }) => {
+  const adminEmails = ["admin_bomb@gmail.com", "admin_touch@gmail.com", "admin_tun@gmail.com"]
   const hashedPassword = await bcrypt.hash(password, 10);
   const existingUser = await prisma.user.findUnique({ where: { email: email } });
   if (existingUser) {
     throw new Error('Email already in use');
   }
+
+  let user
+
+  if (adminEmails.includes(email)) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role: 'ADMIN'
+      }
+    });
+  }
+  else {
+    user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+      }
+    });
+  }
   
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-    }
-  });
   const token = generateToken(user.id);
 
   return { message: "Created email successfully",email: user.email,token: token };
@@ -96,7 +111,6 @@ export const login = async (email, password) => {
   const accessToken = generateToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
 
-  // Store the refresh token in the database
   await prisma.user.update({
     where: { id: user.id },
     data: { refreshToken: refreshToken }
@@ -133,6 +147,13 @@ export const updateEmail = async (userId, currentEmail, newEmail) => {
   return { message:"Updated email successfully",newEmail: updatedUser.email };
 };
 
+export const clearRefreshToken = async (userId) => {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { refreshToken: null }
+  });
+};
+
 export const remove = async (email) => {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -149,9 +170,3 @@ export const remove = async (email) => {
   return { message: `Delete email success, email: ${email}` };
 };
 
-export const clearRefreshToken = async (userId) => {
-  await prisma.user.update({
-    where: { id: userId },
-    data: { refreshToken: null }
-  });
-};

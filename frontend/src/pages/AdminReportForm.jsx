@@ -1,9 +1,9 @@
 import AdminReport from "../components/Reports/AdminReport";
 
-const AdminReportDetail = () => {
+const AdminReportForm = () => {
   return (
     <AdminReport />
   )
 }
 
-export default AdminReportDetail
+export default AdminReportForm

@@ -13,7 +13,6 @@ const Sidebar = () => {
       navigate('/login');
     } catch (error) {
       console.error('Logout failed', error);
-      // Optionally, you can still navigate to login or show an error message to the user
       navigate('/login');
     }
   };

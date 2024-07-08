@@ -1,9 +1,9 @@
-/* eslint-disable react/prop-types */
 import { useState } from 'react';
 
-const UpdateProfileModal = ({ isOpen, onClose }) => {
+const UpdateProfileModal = ({ isOpen, onClose, onUpdate }) => {
   const [email, setEmail] = useState('');
-  const [image, setImage] = useState(null);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -11,30 +11,31 @@ const UpdateProfileModal = ({ isOpen, onClose }) => {
     setEmail(e.target.value);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Email:', email);
-    console.log('Image:', image);
-    // You would typically send this data to your backend here
-    onClose();
+    setError('');
+    setIsLoading(true);
+    try {
+      await onUpdate(email);
+      setEmail('');
+      onClose();
+    } catch (error) {
+      console.error('Error updating email:', error);
+      setError(error.message || 'Failed to update email');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg w-96">
-        <h2 className="text-2xl font-bold mb-4">Update Profile</h2>
+        <h2 className="text-2xl font-bold mb-4">Update Email</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              New Email
             </label>
             <input
               type="email"
@@ -42,33 +43,20 @@ const UpdateProfileModal = ({ isOpen, onClose }) => {
               value={email}
               onChange={handleEmailChange}
               className="w-full p-2 border rounded"
-              placeholder="Enter your email"
+              placeholder="Enter your new email"
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-              Profile Image
-            </label>
-            <input
-              type="file"
-              id="image"
-              onChange={handleImageChange}
-              className="w-full p-2 border rounded"
-              accept="image/*"
-            />
-          </div>
-          {image && (
-            <div className="mb-4">
-              <p className="text-sm text-gray-500">Selected file: {image.name}</p>
-            </div>
-          )}
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="mr-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
-              Save
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Updating...' : 'Update Email'}
             </button>
           </div>
         </form>

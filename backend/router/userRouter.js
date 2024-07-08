@@ -11,8 +11,8 @@ router.post('/refresh-token', refreshTokenController);
 
 // Protected 
 router.get('/profile', authenticateToken, userProfile);
+router.delete('/delete',authenticateToken ,deleteUser);
 router.put('/update', authenticateToken, updateUserEmail);
-router.delete('/delete', authenticateToken, deleteUser);
 router.use('/points',authenticateToken, pointTransactionRouter);
 router.post('/logout', authenticateToken, logoutUser);
 

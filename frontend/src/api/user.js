@@ -56,7 +56,23 @@ const userApi = {
   getProfile: () => api.get('/user/profile'),
 
   // Update user email
-  updateEmail: (newEmail) => api.put('/user/update', { newEmail }),
+  updateEmail: async (newEmail) => {
+    try {
+      const response = await api.put('/user/update', { newEmail });
+      return response.data;
+    } catch (error) {
+      console.error('Update email API error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error request:', error.request);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Failed to update email');
+      } else if (error.request) {
+        throw new Error('No response received from server');
+      } else {
+        throw error;
+      }
+    }
+  },
 
   // Delete user account
   deleteAccount: () => api.delete('/user/delete'),

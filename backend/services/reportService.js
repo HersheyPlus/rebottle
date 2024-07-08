@@ -35,11 +35,13 @@ export const createReport = async (
   userId,
   { description, latitude, longitude }
 ) => {
+  const latitudeNum = parseFloat(latitude);
+  const longitudeNum = parseFloat(longitude);
   const report = await prisma.report.create({
     data: {
       description,
-      latitude,
-      longitude,
+      latitude:latitudeNum,
+      longitude:longitudeNum,
       userId,
     },
   });
@@ -60,8 +62,8 @@ export const updateReport = async (reportId, userId, updateData) => {
   const dataToUpdate = {};
   if ("description" in updateData)
     dataToUpdate.description = updateData.description;
-  if ("latitude" in updateData) dataToUpdate.latitude = updateData.latitude;
-  if ("longitude" in updateData) dataToUpdate.longitude = updateData.longitude;
+  if ("latitude" in updateData) dataToUpdate.latitude = parseFloat(updateData.latitude);
+  if ("longitude" in updateData) dataToUpdate.longitude = parseFloat(updateData.longitude);
 
   if (Object.keys(dataToUpdate).length > 0) {
     const updatedReport = await prisma.report.update({

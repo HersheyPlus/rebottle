@@ -2,6 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 // src/AuthContext.jsx
+
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/user';
@@ -33,11 +34,9 @@ export const AuthProvider = ({ children }) => {
 
 
   const register = async (email, password) => {
-    console.log('Register function called with:', { email, password: '****' });
     try {
       const response = await userApi.register({ email, password });
       console.log('Registration response in AuthContext:', response);
-      
       if (response && response.token) {
         localStorage.setItem('accessToken', response.token);
         setIsAuthenticated(true);
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }) => {
 
 
   const login = async (email, password) => {
-    try {
+    try {      
       const response = await userApi.login({ email, password });
       console.log('Login response in AuthContext:', response);
       
@@ -91,6 +90,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     user,
+    setUser,
     register,
     login,
     logout,
