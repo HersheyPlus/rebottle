@@ -146,6 +146,11 @@ export const updateProfile = async (userId, updateData) => {
     },
   });
 
+  await prisma.pointTransaction.updateMany({
+    where: { userId },
+    data: { userEmail: updatedUser.email },
+  });
+
   return { message: "Profile updated successfully", user: updatedUser };
 };
 
@@ -165,7 +170,7 @@ export const remove = async (email) => {
     throw new Error(`User with email ${email} not found`);
   }
 
-  await prisma.user.delete({
+  await prisma.user.deleteMany({
     where: { email },
   });
 
