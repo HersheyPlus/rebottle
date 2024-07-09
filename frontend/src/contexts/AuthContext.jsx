@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password) => {
     try {
       const response = await userApi.register({ email, password });
-      console.log('Registration response in AuthContext:', response);
       if (response && response.token) {
         localStorage.setItem('accessToken', response.token);
         setIsAuthenticated(true);
@@ -55,7 +54,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {      
       const response = await userApi.login({ email, password });
-      console.log('Login response in AuthContext:', response);
       
       if (response && response.accessToken) {
         localStorage.setItem('accessToken', response.accessToken);

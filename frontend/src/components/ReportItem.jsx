@@ -6,7 +6,7 @@ const ReportItem = ({ report, user }) => {
     <div className="bg-gray-50 flex gap-8 border-2 border-primary p-4 rounded-xl shadow-lg">
       <div className="w-[200px] h-[200px]">
         <img
-          src={report.imageUrl || "../../public/vite.svg"}
+          src={report.imageUrl || "/vite.svg"}
           alt="Report image"
           className="w-full h-auto object-cover"
         />

@@ -11,7 +11,6 @@ const UserProfile = () => {
   const [error, setError] = useState("");
   const { user, logout, setUser } = useAuth();
   const navigate = useNavigate();
-  console.log(user);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -24,9 +23,7 @@ const UserProfile = () => {
       setIsUpdating(true);
       setError("");
       try {
-        console.log("Attempting to update profile:", updateData);
         const result = await userApi.updateProfile(updateData);
-        console.log("Profile update result:", result);
 
         setUser((prevUser) => ({
           ...prevUser,
@@ -37,9 +34,7 @@ const UserProfile = () => {
         }));
 
         closeModal();
-        console.log("Profile updated successfully");
       } catch (error) {
-        console.error("Error in handleUpdateProfile:", error);
         setError(error.message || "Failed to update profile");
       } finally {
         setIsUpdating(false);

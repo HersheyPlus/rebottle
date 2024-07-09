@@ -11,7 +11,8 @@ const AdminReport = () => {
     formState: { errors },
   } = useForm();
   const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setisLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -21,10 +22,10 @@ const AdminReport = () => {
       try {
         const data = await adminApi.getReportById(id);
         setReport(data.report);
-        setLoading(false);
+        setisLoading(false);
       } catch (err) {
         setError(err.message);
-        setLoading(false);
+        setisLoading(false);
       }
     };
     fetchReport();
@@ -32,6 +33,7 @@ const AdminReport = () => {
 
   const onSubmit = async (data) => {
     try {
+      setIsSubmitting(true);
       await adminApi.updateReport(id, {
         plasticCount: parseInt(data.plastic),
         glassCount: parseInt(data.glass),
@@ -39,13 +41,15 @@ const AdminReport = () => {
         milkCount: parseInt(data.milk),
       });
       alert("Report updated successfully");
-      navigate('/admin-report-list');
+      navigate("/admin-report-list");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!report) return <p>No report found</p>;
 
@@ -58,7 +62,8 @@ const AdminReport = () => {
           <p className="mb-2">user id: {report.userId}</p>
           <p className="mb-2">latitude: {report.latitude}</p>
           <p className="mb-2">longitude: {report.longitude}</p>
-          <p className="mb-14">description: {report.description}</p>
+          <p className="mb-4">description: {report.description}</p>
+          <img src={report?.imageUrl} alt="report-image" className="mb-12" />
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -98,28 +103,62 @@ const AdminReport = () => {
             </div>
           ))}
 
-          {report.status === "PENDING" && (<button
-            type="submit"
-            className="w-full bg-primary text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
-          >
-            Collect
-          </button>)}
+          {report.status === "PENDING" && (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full ${
+                isSubmitting ? "bg-gray-400" : "bg-primary hover:bg-primary/90"
+              } text-white p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-secondary mb-16 transition-colors duration-200`}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Collecting...
+                </span>
+              ) : (
+                "Collect"
+              )}
+            </button>
+          )}
           {report.status === "COLLECTED" && (
             <Link to="/admin-report-list">
-            <button
-            type="submit"
-            className="w-full bg-green-500 text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
-          >
-            Collect
-          </button></Link>)}
+              <button
+                type="submit"
+                className="w-full bg-green-500 text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
+              >
+                Collect
+              </button>
+            </Link>
+          )}
           {report.status === "CANCELLED" && (
             <Link to="/admin-report-list">
-            <button
-            type="submit"
-            className="w-full bg-red-500 text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
-          >
-            Collect
-          </button></Link>
+              <button
+                type="submit"
+                className="w-full bg-red-500 text-white p-4 rounded-2xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-16"
+              >
+                Collect
+              </button>
+            </Link>
           )}
         </form>
       </div>

@@ -17,9 +17,7 @@ const Register = () => {
     setIsLoading(true);
     setError("");
     try {
-      console.log('Submitting registration data:', { email: data.email, password: '****' });
       const success = await register(data.email, data.password);
-      console.log('Registration successful:', success);
       if (success) {
         navigate('/profile');  // Redirect to profile page after successful registration
       }

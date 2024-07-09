@@ -20,7 +20,7 @@ router.post('/refresh-token', refreshTokenController);
 
 // Protected routes
 router.get('/profile', authenticateToken, userProfile);
-router.put('/update', authenticateToken, handleUpload, updateUserProfile);
+router.put('/update', authenticateToken, handleUpload("profileImage"), updateUserProfile);
 router.delete('/delete', authenticateToken, deleteUser);
 router.post('/logout', authenticateToken, logoutUser);
 

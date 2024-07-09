@@ -3,7 +3,8 @@ import * as reportService from "../services/reportService.js";
 export const createReport = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const report = await reportService.createReport(userId, req.body);
+    let imageUrl = req.file ? req.file.location : null;
+    const report = await reportService.createReport(userId, req.body, imageUrl);
     res.status(201).json(report);
   } catch (error) {
     next(error)
@@ -37,7 +38,8 @@ export const updateReport = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const reportId = parseInt(req.params.id);
-    const report = await reportService.updateReport(reportId, userId, req.body);
+    let imageUrl = req.file ? req.file.location : null;
+    const report = await reportService.updateReport(reportId, userId, req.body, imageUrl);
     res.status(200).json(report);
   } catch (error) {
     if (

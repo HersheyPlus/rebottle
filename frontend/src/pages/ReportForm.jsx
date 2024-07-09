@@ -8,8 +8,8 @@ const ReportForm = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -23,31 +23,32 @@ const ReportForm = () => {
     }
   };
 
- const onSubmit = async (data) => {
-  setError('');
-  setSuccess('');
-
-  try {
-
-    const formData = new FormData();
-    formData.append('latitude', data.latitude);
-    formData.append('longitude', data.longitude);
-    formData.append('description', data.description);
-
-    if (selectedImage) {
-      formData.append('image', selectedImage);
+  const onSubmit = async (data) => {
+    setError('');
+    setIsLoading(true);
+  
+    try {
+      const formData = new FormData();
+      formData.append('latitude', data.latitude);
+      formData.append('longitude', data.longitude);
+      formData.append('description', data.description);
+  
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+  
+      await reportApi.createReport(formData);
+      navigate('/user-report-list');
+      reset();
+      setSelectedImage(null);
+      setImagePreview(null);
+    } catch (error) {
+      setError(error.message || 'Failed to submit report. Please try again.');
     }
-
-    await reportApi.createReport(formData);
-    navigate('/user-report-list');
-    setSuccess('Report submitted successfully!');
-    reset(); // Reset form fields
-    setSelectedImage(null);
-    setImagePreview(null);
-  } catch (error) {
-    setError(error.message || 'Failed to submit report. Please try again.');
-  }
-};
+    finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section id="report-form" className="section-container h-screen">
@@ -62,7 +63,6 @@ const ReportForm = () => {
         </p>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        {success && <p className="text-green-500 mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-8">
@@ -142,9 +142,20 @@ const ReportForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white p-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-secondary mb-8"
+            disabled={isLoading}
+            className={`w-full ${isLoading ? 'bg-gray-400' : 'bg-primary hover:bg-primary/90'} text-white p-4 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary mb-8 transition-colors duration-200`}
           >
-            Submit Report
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+              </span>
+            ) : (
+              'Submit Report'
+            )}
           </button>
         </form>
       </div>

@@ -5,7 +5,6 @@ const userApi = {
   register: async (userData) => {
     try {
       const response = await api.post('/user/register', userData);
-      console.log('API register response:', response);
       if (response.data && response.data.token) {
         return response.data;
       } else {
@@ -22,7 +21,6 @@ const userApi = {
   login: async (credentials) => {
     try {
       const response = await api.post('/user/login', credentials);
-      console.log('API login response:', response);
       if (response.data && response.data.accessToken) {
         return response.data;
       } else {
