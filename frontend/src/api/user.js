@@ -56,16 +56,20 @@ const userApi = {
   getProfile: () => api.get('/user/profile'),
 
   // Update user email
-  updateEmail: async (newEmail) => {
+  updateProfile: async (updateData) => {
     try {
-      const response = await api.put('/user/update', { newEmail });
+      const formData = new FormData();
+      if (updateData.email) formData.append('email', updateData.email);
+      if (updateData.profileImage) formData.append('profileImage', updateData.profileImage);
+  
+      const response = await api.put('/user/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       return response.data;
     } catch (error) {
-      console.error('Update email API error:', error);
-      console.error('Error response:', error.response);
-      console.error('Error request:', error.request);
+      console.error('Update profile API error:', error);
       if (error.response) {
-        throw new Error(error.response.data.message || 'Failed to update email');
+        throw new Error(error.response.data.message || 'Failed to update profile');
       } else if (error.request) {
         throw new Error('No response received from server');
       } else {
@@ -80,17 +84,6 @@ const userApi = {
 
   // Refresh token
   refreshToken: (refreshToken) => api.post('/user/refresh-token', { refreshToken }),
-
-  // Get all point transactions
-  getPointTransactions: (page = 1, limit = 10) => 
-    api.get(`/user/points/transaction?page=${page}&limit=${limit}`),
-
-  // Get a specific point transaction
-  getPointTransactionById: (transactionId) => 
-    api.get(`/user/points/transaction/${transactionId}`),
-
-  // Exchange points
-  exchangePoints: (points) => api.put('/user/points/exchanges', { points }),
 };
 
 export default userApi;

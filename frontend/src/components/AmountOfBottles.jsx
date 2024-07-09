@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { PieChart } from "react-minimal-pie-chart";
-import reportApi from "../api/report"; // adjust the import path as needed
+import reportApi from "../api/report";
+import { formatNumber } from "../utils/numberFormat"
+import {useAuth} from '../contexts/AuthContext'
+import adminApi from '../api/admin'
 
 const AmountOfBottles = () => {
   const [bottleCounts, setBottleCounts] = useState({
@@ -11,11 +14,19 @@ const AmountOfBottles = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchReports = async () => {
+      if (!user) return;
+
       try {
-        const data = await reportApi.getReports();
+        let data;
+        if (user.role === "ADMIN") {
+          data = await adminApi.getReports();
+        } else {
+          data = await reportApi.getReports();
+        }
         const reports = data.reports;
         
         const counts = reports.reduce((acc, report) => {
@@ -35,9 +46,10 @@ const AmountOfBottles = () => {
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
 
-  if (loading) return <p>Loading...</p>;
+  if (!user || loading) return <p>Loading...</p>;
+  const isAdmin = user.role === "ADMIN";
   if (error) return <p>Error: {error}</p>;
 
   const bottles = [
@@ -50,10 +62,10 @@ const AmountOfBottles = () => {
   const totalBottles = bottles.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
-    <section id="chart" className="flex gap-8">
-      <div className=" w-[400px] h-[400px]">
-        <h1 className="text-2xl font-bold text-center mb-4">
-          Bottles Distribution
+    <section id="chart" className={`flex ${isAdmin ? "gap-12 justify-center" :"gap-8"}`}>
+      <div className={`${isAdmin ? "w-[500px] h-[500px]" : "w-[400px] h-[400px]"}`}>
+        <h1 className={`text-2xl font-bold text-center ${isAdmin ? "mb-8" : "mb-4"}`}>
+          {isAdmin ? "Total Bottles Collected" : "Your Bottles Collected"}
         </h1>
         <PieChart
           data={bottles}
@@ -71,15 +83,15 @@ const AmountOfBottles = () => {
         {bottles.map((bottle, i) => (
           <div key={i} className="flex items-center gap-2">
             <div
-              className="w-6 h-6 mr-2"
+              className={`${isAdmin ? "w-8 h-8" : "w-6 h-6"} mr-2`}
               style={{ backgroundColor: bottle.color }}
             ></div>
             <span>
-              {bottle.title}: {bottle.value}
+              {bottle.title}: {formatNumber(bottle.value)}
             </span>
           </div>
         ))}
-        <h1>total: {totalBottles} bottles</h1>
+        <h1 className="mt-1 font-medium">total: {formatNumber(totalBottles)} bottles</h1>
       </div>
     </section>
   );

@@ -1,7 +1,16 @@
 import express from 'express';
-import { loginUser, registerUser, updateUserEmail, deleteUser, userProfile, logoutUser, refreshTokenController } from '../controllers/userController.js';
+import { 
+  loginUser, 
+  registerUser, 
+  updateUserProfile, 
+  deleteUser, 
+  userProfile, 
+  logoutUser, 
+  refreshTokenController 
+} from '../controllers/userController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import pointTransactionRouter from './pointTransactionRouter.js';
+import { handleUpload } from '../utils/s3.js';
 
 const router = express.Router();
 
@@ -9,11 +18,13 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/refresh-token', refreshTokenController);
 
-// Protected 
+// Protected routes
 router.get('/profile', authenticateToken, userProfile);
-router.delete('/delete',authenticateToken ,deleteUser);
-router.put('/update', authenticateToken, updateUserEmail);
-router.use('/points',authenticateToken, pointTransactionRouter);
+router.put('/update', authenticateToken, handleUpload, updateUserProfile);
+router.delete('/delete', authenticateToken, deleteUser);
 router.post('/logout', authenticateToken, logoutUser);
+
+// Nested router for point transactions
+router.use('/points', authenticateToken, pointTransactionRouter);
 
 export default router;

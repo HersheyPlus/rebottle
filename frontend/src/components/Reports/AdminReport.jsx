@@ -38,6 +38,7 @@ const AdminReport = () => {
         aluminumCount: parseInt(data.aluminum),
         milkCount: parseInt(data.milk),
       });
+      alert("Report updated successfully");
       navigate('/admin-report-list');
     } catch (err) {
       setError(err.message);

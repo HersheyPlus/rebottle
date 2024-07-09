@@ -4,7 +4,7 @@ import { sideBarItems } from "../constants/sideItem";
 import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -16,6 +16,12 @@ const Sidebar = () => {
       navigate('/login');
     }
   };
+
+  const filteredItems = sideBarItems.filter(item => 
+    item.role === "ALL" || 
+    (user && user.role === item.role) || 
+    (item.role === "USER" && user && user.role !== "ADMIN")
+  );
 
   return (
     <section id="sidebar">
@@ -32,7 +38,7 @@ const Sidebar = () => {
             </h1>
           </Link>
           <ul className="space-y-2 font-medium text-lg lg:text-xl">
-            {sideBarItems.map((item, index) => {
+            {filteredItems.map((item, index) => {
               if ((item.label === "Login" && isAuthenticated) ||
                   (item.label === "Logout" && !isAuthenticated)) {
                 return null;

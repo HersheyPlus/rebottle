@@ -17,6 +17,9 @@ const Profile = () => {
           <div className="border-secondary border mt-3 mb-20"></div>
         </div>
         <AdminProfile />
+        <div className="mt-20">
+          <AmountOfBottles />
+        </div>
       </div>
     </section>
     ) : (

@@ -7,30 +7,42 @@ import userApi from "../api/user";
 const UserProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState("");
   const { user, logout, setUser } = useAuth();
   const navigate = useNavigate();
+  console.log(user);
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = () => {
+    setIsModalOpen(true);
+    setError(""); // Clear any existing errors when opening the modal
+  };
   const closeModal = () => setIsModalOpen(false);
 
-  const handleUpdateEmail = useCallback(
-    async (newEmail) => {
+  const handleUpdateProfile = useCallback(
+    async (updateData) => {
+      setIsUpdating(true);
+      setError("");
       try {
-        console.log("Attempting to update email to:", newEmail);
-        const result = await userApi.updateEmail(newEmail);
-        console.log("Email update result:", result);
+        console.log("Attempting to update profile:", updateData);
+        const result = await userApi.updateProfile(updateData);
+        console.log("Profile update result:", result);
 
         setUser((prevUser) => ({
           ...prevUser,
-          email: newEmail,
+          ...(result.user.email && { email: result.user.email }),
+          ...(result.user.profileImageUrl && {
+            profileImageUrl: result.user.profileImageUrl,
+          }),
         }));
 
         closeModal();
-        console.log("Email updated successfully");
+        console.log("Profile updated successfully");
       } catch (error) {
-        console.error("Error in handleUpdateEmail:", error);
-        setError(error.message || "Failed to update email");
+        console.error("Error in handleUpdateProfile:", error);
+        setError(error.message || "Failed to update profile");
+      } finally {
+        setIsUpdating(false);
       }
     },
     [setUser, closeModal]
@@ -64,13 +76,19 @@ const UserProfile = () => {
       <div className="flex gap-4 items-center justify-between p-6 bg-white rounded-lg shadow-md">
         <div className="flex gap-12">
           <img
-            src="/user.jpg"
-            alt="profile"
+            src={user?.profileImageUrl || "/user.png"}
+            alt="User profile"
             className="w-40 h-40 mb-3 rounded-full shadow-lg border-4 border-white"
+            onError={(e) => {
+              console.error("Error loading image:", e);
+              e.target.src = "/user.png";
+            }}
           />
           <div className="mt-4 flex flex-col gap-2">
-            <h1 className="text-2xl font-medium">{user?.email} (User)</h1>
-            <p className="text-sm text-secondary -mt-1">{user?.id}</p>
+            <h1 className="text-2xl font-medium">{user?.email}</h1>
+            <p className="text-sm text-secondary -mt-1">
+              {user?.role} : {user?.userId}
+            </p>
             <h3 className="font-medium mt-2">
               If you forgot password, contact:
             </h3>
@@ -85,8 +103,9 @@ const UserProfile = () => {
           <button
             onClick={openModal}
             className="text-white bg-primary p-4 rounded-2xl border-secondary hover:bg-primary/90"
+            disabled={isUpdating}
           >
-            Update Email
+            {isUpdating ? "Updating..." : "Update Profile"}
           </button>
           <button
             onClick={handleDeleteAccount}
@@ -101,7 +120,9 @@ const UserProfile = () => {
       <UpdateProfileModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onUpdate={handleUpdateEmail}
+        onUpdate={handleUpdateProfile}
+        currentEmail={user?.email || ""}
+        currentImageUrl={user?.profileImageUrl || "/user.png"}
       />
     </>
   );

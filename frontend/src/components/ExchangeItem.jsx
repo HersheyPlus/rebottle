@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { FaStar } from "react-icons/fa";
 import { pointsApi } from '../api/points';
 import { useAuth } from '../contexts/AuthContext';
+import { formatNumber } from '../utils/numberFormat';
 
-const formatNumber = (num) => {
-  return new Intl.NumberFormat().format(num);
-};
+
 
 const ExchangeItem = ({rating, points, type}) => {
   const [isExchanging, setIsExchanging] = useState(false);

@@ -5,19 +5,20 @@ import helmet from 'helmet';
 import constant from "./constants/index.js";
 import router from './router/index.js';
 
-// Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app = express();
 
+
 // cors options 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Allow requests from this origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-  credentials: true, // Allow cookies to be sent with requests
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
 
 // Middleware
@@ -33,6 +34,7 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? {} : err
   });
 })
+
 
 // Routes
 app.use('/api', router);

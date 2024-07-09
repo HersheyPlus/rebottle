@@ -56,26 +56,6 @@ export const logoutUser = async (req, res, next) => {
   }
 };
 
-export const updateUserEmail = async (req, res, next) => {
-  try {
-    const userEmail = req.user.email;
-    const userId = req.user.id;
-    const { newEmail } = req.body;
-
-    if (!newEmail) {
-      return res.status(400).json({ message: 'New email is required' });
-    }
-
-    const updatedUser = await userService.updateEmail(userId,userEmail, newEmail);
-    res.json(updatedUser);
-  } catch (error) {
-    if (error.message === 'Email already in use') {
-      res.status(400).json({ message: error.message });
-    } else {
-      next(error);
-    }
-  }
-};
 
 export const deleteUser = async (req, res, next) => {
   try {
@@ -99,6 +79,28 @@ export const refreshTokenController = async (req, res, next) => {
     res.json(tokens);
   } catch (error) {
     next(error);
+  }
+};
+
+export const updateUserProfile = async (req, res, next) => {
+  try {
+    // req.file will contain the uploaded file information if the upload was successful
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const userId = req.user.id;
+    const { email } = req.body;
+
+    let updateData = {};
+    if (email) updateData.email = email;
+    if (req.file) updateData.profileImageUrl = req.file.location; // S3 URL of the uploaded file
+
+    const updatedUser = await userService.updateProfile(userId, updateData);
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Error in updateUserProfile:', error);
+    res.status(500).json({ message: 'Error updating profile', error: error.message });
   }
 };
 
